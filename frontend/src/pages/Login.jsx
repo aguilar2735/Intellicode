@@ -3,6 +3,8 @@ import { useState, useContext } from "react";
 import { useNavigate, useLocation, Navigate } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
+import { toast } from "react-toastify";
+import { Eye, EyeOff } from "lucide-react";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -12,6 +14,8 @@ const Login = () => {
   const { user, setUser } = useContext(AuthContext);
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   if (user) return <Navigate to={from} replace />;
 
@@ -22,6 +26,13 @@ const Login = () => {
     e.preventDefault();
     setError("");
 
+    if (!formData.email || !formData.password) {
+      setError("All fields are required.");
+      toast.error("Please fill out all fields.");
+      return;
+    }
+
+    setLoading(true);
     try {
       const res = await axios.post("http://localhost:8000/api/token/", formData);
       const { access, refresh } = res.data;
@@ -33,10 +44,14 @@ const Login = () => {
       });
 
       setUser(profileRes.data);
-      navigate(from, { replace: true }); // ✅ Redirect to intended destination
+      toast.success("Login successful!");
+      navigate(from, { replace: true });
     } catch (err) {
       console.error(err);
       setError("Invalid email or password");
+      toast.error("Login failed. Please check your credentials.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -57,20 +72,33 @@ const Login = () => {
             onChange={handleChange}
             className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
           />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            required
-            value={formData.password}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
-          />
+
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Password"
+              required
+              value={formData.password}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-400 pr-10"
+            />
+            <span
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </span>
+          </div>
+
           <button
             type="submit"
-            className="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700"
+            disabled={loading}
+            className={`w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 transition ${
+              loading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 

@@ -13,7 +13,6 @@ const Layout = () => {
 
     // Clear user context
     setUser(null);
-    setRedirectPath(null); // ✅ this clears the stale path
 
     navigate("/login", { replace: true, state: {} })
   };
@@ -34,7 +33,7 @@ const Layout = () => {
               Home
             </Link>
             <Link
-              to="/courses"
+              to="/dashboard/courses"
               className="bg-white text-indigo-600 px-4 py-1 rounded hover:bg-gray-200"
             >
               Courses

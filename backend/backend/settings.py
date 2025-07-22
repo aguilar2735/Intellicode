@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'api.apps.ApiConfig', # ✅ Include your API app
+    'courses.apps.CoursesConfig', # ✅ Include your courses app
     
 ]
 

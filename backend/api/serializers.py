@@ -67,6 +67,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     def get_role(self, obj):
         return obj.role.capitalize() if obj.role else None
+    
 
     def validate(self, attrs):
         # Capitalize names
@@ -74,12 +75,20 @@ class UserProfileSerializer(serializers.ModelSerializer):
             attrs['first_name'] = attrs['first_name'].title()
         if 'last_name' in attrs:
             attrs['last_name'] = attrs['last_name'].title()
+        if 'username' in attrs:
+            attrs['username'] = attrs['username'].title()
 
         # Password match check
         if attrs.get('new_password') or attrs.get('confirm_password'):
             if attrs.get('new_password') != attrs.get('confirm_password'):
                 raise serializers.ValidationError({"password": "Passwords do not match."})
-
+            
+        # Student number uniqueness check
+        student_number = attrs.get('student_number')
+        user = self.instance or self.context['request'].user
+        if student_number:
+            if User.objects.exclude(id=user.id).filter(student_number=student_number).exists():
+                raise serializers.ValidationError({"student_number": "This student number is already taken."})
         return attrs
 
     def update(self, instance, validated_data):

@@ -1,11 +1,10 @@
+import os
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
-import os
 from django.dispatch import receiver
 from django.db.models.signals import pre_save
 from django.conf import settings
-
 
 def default_avatar():
     return 'default.png'  # Stored directly in media/
@@ -75,7 +74,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
-
 
 # ✅ SIGNALS
 

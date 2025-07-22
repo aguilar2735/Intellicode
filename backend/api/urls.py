@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from .views import AdminOnlyView, UserProfileView, AdminDashboardView, InstructorDashboardView, StudentDashboardView, ChangePasswordView
 
 
@@ -9,5 +9,6 @@ urlpatterns = [
     path('dashboard/instructor/', InstructorDashboardView.as_view(), name='instructor-dashboard'),
     path('dashboard/student/', StudentDashboardView.as_view(), name='student-dashboard'),
     path("change-password/", ChangePasswordView.as_view(), name="change-password"),
+    path('courses/', include('courses.urls')),
 ]
 

@@ -1,6 +1,4 @@
-// src/pages/Profile/Profile.jsx
-
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import EditProfile from "./EditProfile";
@@ -9,14 +7,18 @@ const Profile = () => {
   const { user } = useContext(AuthContext);
   const location = useLocation();
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("personal");
 
-  const tabPath = location.pathname.split("/")[2]; // e.g., 'edit', 'change-password'
-
-  const activeTab = (() => {
-    if (tabPath === "change-password") return "password";
-    if (tabPath === "achievements") return "achievements";
-    return "personal";
-  })();
+  // Sync tab with route
+  useEffect(() => {
+    if (location.pathname.includes("change-password")) {
+      setActiveTab("password");
+    } else if (location.pathname.includes("achievements")) {
+      setActiveTab("achievements");
+    } else {
+      setActiveTab("personal");
+    }
+  }, [location.pathname]);
 
   const tabButton = (tabKey, label, path) => (
     <button
@@ -42,7 +44,7 @@ const Profile = () => {
         />
         <div>
           <h2 className="text-2xl font-bold text-indigo-600">My Profile</h2>
-          <p className="text-gray-500 capitalize">Role: {user?.role}</p>
+          <p className="text-gray-500">Role: {user?.role}</p>
         </div>
       </div>
 
@@ -56,7 +58,7 @@ const Profile = () => {
       {/* Tab Content */}
       {activeTab === "personal" && (
         <>
-          {tabPath === "edit" ? (
+          {location.pathname.includes("edit") ? (
             <EditProfile />
           ) : (
             <div className="space-y-4">
